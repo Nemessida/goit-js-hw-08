@@ -1,35 +1,18 @@
-
-// Описаний в документації
-import SimpleLightbox from "simplelightbox";
-// Додатковий імпорт стилів
+import { galleryItems } from "./gallery-items";
+import { createImages } from "./functions";
+import SimpleLightbox from "simplelightbox/dist/simple-lightbox.esm";
 import "simplelightbox/dist/simple-lightbox.min.css";
-
-// Add imports above this line
-import { galleryItems } from './gallery-items';
-// Change code below this line
 
 console.log(galleryItems);
 
+const refs = {
+  divForInsert: document.querySelector(".gallery"),
+};
+const galleryForInsert = createImages(galleryItems);
+refs.divForInsert.insertAdjacentHTML("beforeend", galleryForInsert);
 
-const palletContainer = document.querySelector('.gallery');
-const createGallery = createGellaryItems(galleryItems);
-
-palletContainer.insertAdjacentHTML('beforeend', createGallery);
-
-function createGellaryItems(galleryItems){
-    return galleryItems.map(({ preview, original, description }) => {
-        return `
-        <a class="gallery__item" href="${original}">
-         <img class="gallery__image" src="${preview}" alt="${description}" />
-        </a>
-        `;
-    }).join('');
-    
-}
-
-new SimpleLightbox('.gallery a', { 
-    captions: true,
-    captionsData: "alt",
-    captionDelay: 250,
-
- });
+let gallery = new SimpleLightbox(".gallery a", {
+  captionsData: "alt",
+  captionDelay: 250,
+});
+gallery.on("show.simplelightbox");

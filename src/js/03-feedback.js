@@ -1,78 +1,43 @@
 import throttle from 'lodash.throttle';
-const FEEDBACK_FORM_STATE = 'feedback-form-state';
-let localObject = {email:' ', message:' '};
-// const emailInput = document.querySelector("input");
-// const messageInput = document.querySelector("textarea");
 
-const form = document.querySelector('.feedback-form');
+const DATA_FROM_STORAGE = 'form-field';
 
-form.addEventListener("input", throttle((event) => {
-    event.preventDefault();
-    
-    localObject[event.target.name] = event.target.value
-   
-    localStorage.setItem(FEEDBACK_FORM_STATE, JSON.stringify(localObject));
-  }, 500));
+const refs = {
+  form: document.querySelector('.feedback-form'),
+};
 
+let formData = {};
 
-  const dataLocalObject = localStorage.getItem(FEEDBACK_FORM_STATE);
-  function insrtFromLocalStorage(dataLocalObject)
-  {
+loadData();
 
-//     if (dataLocalObject === null) {
-//   return
-// }
-//     let localObject = JSON.parse(dataLocalObject);
+refs.form.addEventListener('submit', handleFormSubmit);
 
-//     for ( prop in localObject) {
-//       form[name.value] + localObject[prop];
-//     }
-    if (!dataLocalObject) return
-    
-    // console.log(localObject); 
-    try {
-      let localObject = JSON.parse(dataLocalObject);
-      Object.entries(localObject).forEach(([name, value]) => {
-        form[name].value = value
-      })
-    } catch (error) {
-      
-    }
-    
-    // for ( prop in localObject) {
-    //   form[name.value] + localObject[prop];
+refs.form.addEventListener('input', throttle(handleInputChange, 500));
+function handleInputChange(e) {
+  const { name, value } = e.target;
 
-    // if(object && emailInput.name === "email"){
-    //     emailInput.value = JSON.parse(object).email;
-    //   }
-    //   if(object && messageInput.name === "message"){
-    //       messageInput.value = JSON.parse(object).message;
-    //     }
+  formData[name] = value;
 
+  const dataString = JSON.stringify(formData);
+  localStorage.setItem(DATA_FROM_STORAGE, dataString);
+}
+
+function loadData() {
+  const loadData = JSON.parse(localStorage.getItem(DATA_FROM_STORAGE));
+  if (loadData) {
+    const { email, message } = refs.form.elements;
+    email.value = loadData.email || '';
+    message.value = loadData.message || '';
+    formData = loadData;
   }
-        
-  
-  insrtFromLocalStorage(dataLocalObject);
-  
-  form.addEventListener("submit", submitForm);
-  
-  function submitForm(event){
+}
 
-    // const localObject = {
-    //       elements: { email, message }
-    //     } = event.currentTarget;
-    // console.log(email.value, message.value);
+function handleFormSubmit(e) {
+  e.preventDefault();
 
+  console.log(formData);
 
-    console.log(dataLocalObject);
-    localObject = {email:' ', message:' '};
-    
-    event.preventDefault();
-    event.target.reset();
-    localStorage.removeItem(FEEDBACK_FORM_STATE);
-     
-    
-  }
-  
-  
-  
+  localStorage.removeItem(DATA_FROM_STORAGE);
+
+  e.target.reset();
+}
